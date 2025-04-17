@@ -315,23 +315,28 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
 	["enable"] = function()
 		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled = true
 		if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded == false then
+
+			-- Securely hook the function to prevent potential issues
+			local original_TradeFrame_OnShow = _G["TradeFrame_OnShow"]
 			hooksecurefunc("TradeFrame_OnShow", function(self, button)
-					local recv_name = _G["TradeFrameRecipientNameText"]:GetText()
-					local in_guild = false
+
+				-- Check if recipient is in guild				
+				if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled then
 					for i = 1, GetNumGuildMembers() do
-						local name, _, _, _, _, _, _, _, _, _, _ = GetGuildRosterInfo(i)
-						local player_name_short = string.split("-", name)
-						if player_name_short == recv_name then
-							in_guild = true
-							break
+						if not IsPlayerInGuild(i) then
+						print("Handel mit nicht-Schlingeln nicht erlaubt! " .. _G["TradeFrameRecipientNameText"]:GetText() + "ist kein Schlingel!")
+						_G["TradeFrame"]:Hide()
 						end
 					end
-					if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled and in_guild == false then
-						print("Target trade recepient not in guild. " .. recv_name)
-						_G["TradeFrame"]:Hide()
-					end
+				end
+				
+				-- Call the original function to maintain normal behavior
+				if type(original_TradeFrame_OnShow) == 'function' then
+					original_TradeFrame_OnShow(self, button)
+				end
 			end)
 		end
+
 		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded = true
 	end,
 	["disable"] = function(self)
@@ -491,3 +496,11 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Mailbox"]] = {
 		unregisterFunction("MAIL_INBOX_UPDATE", HCU_rule_name_to_id["Guild Only Mailbox"])
 	end,
 }
+
+--Helper Methods
+
+function IsPlayerInGuild(index)
+    local rosterInfo = GetGuildRosterInfo(index)
+	--First entry will be player name. We dont need the rest
+    return rosterInfo[1] == _G["TradeFrameRecipientNameText"]:GetText() 
+end
