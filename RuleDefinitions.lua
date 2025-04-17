@@ -316,7 +316,6 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
 		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled = true
 		if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded == false then
 			hooksecurefunc("TradeFrame_OnShow", function(self, button)
-				C_Timer.After(0.1, function()
 					local recv_name = _G["TradeFrameRecipientNameText"]:GetText()
 					local in_guild = false
 					for i = 1, GetNumGuildMembers() do
@@ -331,7 +330,6 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
 						print("Target trade recepient not in guild. " .. recv_name)
 						_G["TradeFrame"]:Hide()
 					end
-				end)
 			end)
 		end
 		HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].loaded = true
