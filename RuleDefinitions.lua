@@ -333,7 +333,7 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
 				end
 
 				if not found then
-					print("Handel mit nicht-Schlingeln nicht erlaubt! " .. recipientName .. " ist kein Schlingel!")
+					print("Handel mit nicht-Schlingeln ist nicht erlaubt! " .. recipientName .. " ist kein Schlingel!")
 					_G["TradeFrame"]:Hide()
 				end
 				
