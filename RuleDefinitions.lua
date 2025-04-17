@@ -320,14 +320,21 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]] = {
 			local original_TradeFrame_OnShow = _G["TradeFrame_OnShow"]
 			hooksecurefunc("TradeFrame_OnShow", function(self, button)
 
-				-- Check if recipient is in guild				
-				if HCU_rules[HCU_rule_name_to_id["Guild Only Trading"]].enabled then
-					for i = 1, GetNumGuildMembers() do
-						if not IsPlayerInGuild(i) then
-						print("Handel mit nicht-Schlingeln nicht erlaubt! " .. _G["TradeFrameRecipientNameText"]:GetText() + "ist kein Schlingel!")
-						_G["TradeFrame"]:Hide()
-						end
+				-- Check if recipient is in guild
+				local recipientName = _G["TradeFrameRecipientNameText"]:GetText()
+				local found = false
+				for i = 1, GetNumGuildMembers() do
+					local userToCheck = GetGuildRosterInfo(i)
+					-- first entry is the user name.
+					if userToCheck[1] == recipientName then
+						found = true
+						break
 					end
+				end
+
+				if not found then
+					print("Handel mit nicht-Schlingeln nicht erlaubt! " .. recipientName .. " ist kein Schlingel!")
+					_G["TradeFrame"]:Hide()
 				end
 				
 				-- Call the original function to maintain normal behavior
@@ -496,11 +503,3 @@ HCU_rules[HCU_rule_name_to_id["Guild Only Mailbox"]] = {
 		unregisterFunction("MAIL_INBOX_UPDATE", HCU_rule_name_to_id["Guild Only Mailbox"])
 	end,
 }
-
---Helper Methods
-
-function IsPlayerInGuild(index)
-    local rosterInfo = GetGuildRosterInfo(index)
-	--First entry will be player name. We dont need the rest
-    return rosterInfo[1] == _G["TradeFrameRecipientNameText"]:GetText() 
-end
